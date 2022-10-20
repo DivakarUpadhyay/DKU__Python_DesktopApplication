@@ -2,11 +2,35 @@ from ctypes import alignment
 from tkinter import *
 from turtle import color
 from PIL import ImageTk #PIL: Python Image Library
-
+from tkinter import messagebox
+import pymysql
+import sys
 #DivakarUpadhyay Functionality Part
 def signup_page():
     login_window.destroy()
     import Signup
+
+def login_user():
+
+    if usernameEntry.get()=='' or passwordEntry.get()=='':
+       messagebox.showerror('Error','All Fields Are Required')
+    else:
+        try:
+           con=pymysql.connect(host='localhost',user='root',passwd='123456')
+           mycursor=con.cursor()
+        except :
+          messagebox.showerror('Error','Connecton is not established try again')
+        return
+        query="use registeruser"
+        mycursor.execute(query)
+        query='select * from userinformation where username=%s and password=%s'
+        mycursor.execute(query,usernameEntry.get(),passwordEntry.get())
+        row=mycursor.fetchone()
+        if row==None:
+            messagebox.showerror('Error','Invalid Username or password')
+        else:
+            messagebox.showinfo('Welcome','Login is successful')
+
 def user_enter(event):
     if usernameEntry.get()=='Username':
         usernameEntry.delete(0,END)
@@ -79,7 +103,7 @@ forgetButton.place(x=715,y=295)
 #Divakar Upadhyay Login Button Creation Start
 loginButton=Button(login_window,text='Login',font=('Open Sans',16,'bold'),
                    fg='white',bg='firebrick1',activebackground='white',
-                   activeforeground='firebrick1',cursor='hand2',bd=0,width=19)
+                   activeforeground='firebrick1',cursor='hand2',bd=0,width=19,command=login_user)
 loginButton.place(x=578,y=350)
 #Divakar Upadhyay Login Button Creation End
 

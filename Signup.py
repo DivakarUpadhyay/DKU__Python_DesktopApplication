@@ -1,12 +1,54 @@
 from ctypes import alignment
 from tkinter import *
 from turtle import color
-from PIL import ImageTk
-from matplotlib.widgets import CheckButtons #PIL: Python Image Library
+from PIL import ImageTk #PIL: Python Image Library
+from tkinter import messagebox
+from matplotlib.widgets import CheckButtons 
+import pymysql
+
+def clear():
+    emailEntry.delete(0,END)
+    usernameEntry.delete(0,END)
+    passwordEntry.delete(0,END)
+    confirmpasswordEntry.delete(0,END)
+    check.set(0)
+    signup_window.destroy()
+    import SignIn
+
+def connect_database():
+     if emailEntry.get()=='' or usernameEntry.get()=='' or passwordEntry.get()=='' or confirmpasswordEntry.get()=='':
+        messagebox.showerror('Error','All Fields Are Required')
+     elif passwordEntry.get()!=confirmpasswordEntry.get():
+        messagebox.showerror('Error','Password Mismatch')
+     elif check.get()==0:
+        messagebox.showerror('Error','Please Accept Terms & Conditions')
+     else:
+        try:
+           con=pymysql.connect(host='localhost',user='root',password='123456')
+           mycursor=con.cursor()
+        except:
+           messagebox.showerror('Error','Database Connectivity Issue, Please try again')
+           return
+        try:   
+            query='create database registeruser'
+            mycursor.execute(query)
+            query='use registeruser'
+            mycursor.execute(query)
+            query='CREATE TABLE userinformation(Id int(100) NOT NULL AUTO_INCREMENT,username NVARCHAR(50),password NVARCHAR(50),Email NVARCHAR(100),CONSTRAINT id_pk PRIMARY KEY(Id))'
+            mycursor.execute(query)
+        except:
+            mycursor.execute('use registeruser')     
+            query='insert into userinformation(username,password,Email)values(%s,%s,%s)'
+            mycursor.execute(query,(usernameEntry.get(),passwordEntry.get(),emailEntry.get()))
+            con.commit()
+            con.close()
+            messagebox.showerror('Success','Registration is successful')
+            clear()
 
 def login_page():
     signup_window.destroy()
     import SignIn
+
 #DivakarUpadhyay GUI Part
 signup_window=Tk()
 signup_window.title('Signup Page')
@@ -47,16 +89,17 @@ confirmpasswordLabel.grid(row=7,column=0,sticky='w',padx=25)
 confirmpasswordEntry=Entry(frame,width=30,font=('Microsoft Yahei UI Light',10,'bold'),bg='firebrick1',fg='white')
 confirmpasswordEntry.grid(row=8,column=0,sticky='w',padx=25)
 
+check=IntVar()
 termsandconditions=Checkbutton(frame,text='I agree to the Terms & Conditions',font=('Microsoft Yahei UI Light',9,'bold'),
-                                  fg='firebrick1',bg='white',activebackground='white',activeforeground='firebrick1',cursor='hand2')
+                                  fg='firebrick1',bg='white',activebackground='white',activeforeground='firebrick1',cursor='hand2',variable=check)
 termsandconditions.grid(row=9,column=0,pady=10,padx=15)
 
 signupButton=Button(frame,text='Signup',font=('Open Sans',16,'bold'),bd=0,fg='white',bg='firebrick1'
-                    ,activebackground='firebrick1',activeforeground='white',width=17)
+                    ,activebackground='firebrick1',activeforeground='white',width=17,command=connect_database)
 signupButton.grid(row=10,column=0)
 
 #Divakar Upadhyay SignUp Label Creation Start
-alreadyanccount=Label(frame,text='Dont have an account?',font=('Open Sans',9,'bold'),fg='firebrick1',bg='white')
+alreadyanccount=Label(frame,text='have an account?',font=('Open Sans',9,'bold'),fg='firebrick1',bg='white')
 alreadyanccount.grid(row=11,column=0,sticky='w',padx=25,pady=20)
 #Divakar Upadhyay SignUp Label Creation End
 
