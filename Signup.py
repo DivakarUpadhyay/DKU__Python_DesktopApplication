@@ -37,13 +37,19 @@ def connect_database():
             query='CREATE TABLE userinformation(Id int(100) NOT NULL AUTO_INCREMENT,username NVARCHAR(50),password NVARCHAR(50),Email NVARCHAR(100),CONSTRAINT id_pk PRIMARY KEY(Id))'
             mycursor.execute(query)
         except:
-            mycursor.execute('use registeruser')     
-            query='insert into userinformation(username,password,Email)values(%s,%s,%s)'
-            mycursor.execute(query,(usernameEntry.get(),passwordEntry.get(),emailEntry.get()))
-            con.commit()
-            con.close()
-            messagebox.showerror('Success','Registration is successful')
-            clear()
+            mycursor.execute('use registeruser')
+            query='select * from userinformation where username=%s' 
+            mycursor.execute(query,(usernameEntry.get()))
+            row=mycursor.fetchone()
+            if row!=None:
+                messagebox.showerror('Error','UserName already Exist')
+            else:
+                query='insert into userinformation(username,password,Email)values(%s,%s,%s)'
+                mycursor.execute(query,(usernameEntry.get(),passwordEntry.get(),emailEntry.get()))
+                con.commit()
+                con.close()
+                messagebox.showerror('Success','Registration is successful')
+                clear()
 
 def login_page():
     signup_window.destroy()

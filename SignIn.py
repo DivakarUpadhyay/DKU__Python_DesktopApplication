@@ -5,6 +5,13 @@ from PIL import ImageTk #PIL: Python Image Library
 from tkinter import messagebox
 import pymysql
 import sys
+
+
+def clear():
+    usernameEntry.delete(0,END)
+    usernameEntry.insert(1,'Username')
+    passwordEntry.delete(0,END)
+    passwordEntry.insert(1,'Password')
 #DivakarUpadhyay Functionality Part
 def signup_page():
     login_window.destroy()
@@ -20,17 +27,17 @@ def login_user():
            mycursor=con.cursor()
         except :
           messagebox.showerror('Error','Connecton is not established try again')
-        return
+          return
         query="use registeruser"
         mycursor.execute(query)
         query='select * from userinformation where username=%s and password=%s'
-        mycursor.execute(query,usernameEntry.get(),passwordEntry.get())
+        mycursor.execute(query,(usernameEntry.get(),passwordEntry.get()))
         row=mycursor.fetchone()
         if row==None:
             messagebox.showerror('Error','Invalid Username or password')
         else:
             messagebox.showinfo('Welcome','Login is successful')
-
+        clear()
 def user_enter(event):
     if usernameEntry.get()=='Username':
         usernameEntry.delete(0,END)
